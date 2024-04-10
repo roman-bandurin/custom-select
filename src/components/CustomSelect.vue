@@ -25,32 +25,25 @@
   </div>
 </template>
 
-<script setup>
+<script setup lang="ts">
 import { computed, ref } from 'vue'
 import { vOnClickOutside, vOnKeyStroke } from '@vueuse/components'
 
+type ValueType = number | string | Record<string, string | number>
+
 const modelValue = defineModel()
-const props = defineProps({
-  items: {
-    type: [Array, Object],
-    default: () => []
-  },
-  itemTitle: {
-    type: String,
-    default: 'title'
-  },
-  itemValue: {
-    type: String,
-    default: 'value'
-  },
-  disabled: {
-    type: Boolean,
-    default: false
-  },
-  placeholder: {
-    type: String,
-    default: ''
-  }
+const props = withDefaults(defineProps<{
+  items: Record<string, ValueType> | ValueType[]
+  itemTitle: string
+  itemValue: string
+  disabled: boolean
+  placeholder: string
+}>(), {
+  items: () => [],
+  itemTitle: 'title',
+  itemValue: 'value',
+  disabled: false,
+  placeholder: ''
 })
 
 const currentItems = computed(() =>
@@ -60,18 +53,17 @@ const currentItems = computed(() =>
       ? Object.entries(props.items)
       : []
   ).map(([key, item], index) => (
-    console.log(key, item, item instanceof Object, Array.isArray(props.items)),
     item instanceof Object
       ? Array.isArray(props.items)
-        ? { title: item[props.itemTitle], value: item[props.itemValue], index }
+        ? { title: item[props.itemTitle], value: item[props.itemValue] as string | number, index }
         : {
           title: item[props.itemTitle],
-          value: props.itemValue in item ? item[props.itemValue] : key,
+          value: props.itemValue in item ? item[props.itemValue] : key as string | number,
           index
         }
       : Array.isArray(props.items)
-        ? { title: item, value: item, index }
-        : { title: item, value: key, index }
+        ? { title: item, value: item as string | number, index } // 
+        : { title: item, value: key as string, index }
   ))
 )
 
@@ -108,12 +100,12 @@ const goNextValue = () => {
   }
 }
 
-const release = (e) => {
+const release = (e: Event) => {
   opened.value = !opened.value
   e.preventDefault()
 }
 
-const select = (value) => {
+const select = (value: ValueType) => {
   modelValue.value = value
   opened.value = false
 }

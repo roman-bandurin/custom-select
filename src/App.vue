@@ -7,9 +7,9 @@
   </main>
 </template>
 
-<script setup>
+<script setup lang="ts">
 import { ref } from 'vue'
-import CustomSelect from './components/CustomSelect.vue'
+import CustomSelect from '@/components/CustomSelect.vue'
 
 const value = ref(0)
 
@@ -19,8 +19,12 @@ const value = ref(0)
 // const data = ref([{ name: "Option 1", id: 1 }, { name: "Option 2", id: 2 }])
 
 // const data = ref({ value1: "Option 1", value2: "Option 2" })
-const data = ref({ value1: { title: "Option 1", value: "1" }, value2: { title: "Option 2", value: 2 }, value3: { title: "Option 3" } })
-
+type ValueType = number | string | Record<string, string | number>
+const data = ref<Record<string, ValueType>>({
+  value1: { title: 'Option 1', value: '1' },
+  value2: { title: 'Option 2', value: 2 },
+  value3: { title: 'Option 3' }
+})
 </script>
 
 <style scoped></style>
